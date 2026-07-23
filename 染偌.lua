@@ -36,6 +36,8 @@ InfoSec:AddLabel("注入器："..identifyexecutor())
 local UniversalTab = Window:MakeTab({Name = "通用", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local Speed = 1
 local sudu = nil
+local Jump = false
+local JumpConn = nil
 
 UniversalTab:AddToggle({
 	Name = "速度 (开/关)",
@@ -120,6 +122,54 @@ UniversalTab:AddToggle({
 })
 
 UniversalTab:AddButton({
+	Name = "染飞行",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/FengYu-X/Function/refs/heads/main/fly.lua"))()
+	end
+})
+
+UniversalTab:AddToggle({
+	Name = "无限跳",
+	Default = false,
+	Callback = function(Value)
+        Jump = Value
+        if JumpConn then
+            JumpConn:Disconnect()
+            JumpConn = nil
+        end
+        if Jump then
+            JumpConn = game.UserInputService.JumpRequest:Connect(function()
+                if Jump and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+                    game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+                end
+            end)
+        end
+    end
+})
+
+UniversalTab:AddToggle({
+	Name = "停止移动",
+	Default = false,
+	Callback = function(enabled)
+  		local localPlayer = game.Players.LocalPlayer
+  		local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+  		if enabled then
+    		for _, child in pairs(character:GetChildren()) do
+      			if child:IsA("BasePart") then
+        			child.Anchored = true
+      			end
+    		end
+  		else
+    		for _, child in pairs(character:GetChildren()) do
+      			if child:IsA("BasePart") then
+        			child.Anchored = false
+      			end
+    		end
+  		end
+	end
+})
+
+UniversalTab:AddButton({
 	Name = "点击传送工具",
 	Callback = function()
 mouse = game.Players.LocalPlayer:GetMouse() tool = Instance.new("Tool") tool.RequiresHandle = false tool.Name = "[FE] TELEPORT TOOL" tool.Activated:connect(function() local pos = mouse.Hit+Vector3.new(0,2.5,0) pos = CFrame.new(pos.X,pos.Y,pos.Z) game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos end) tool.Parent = game.Players.LocalPlayer.Backpack
@@ -130,4 +180,3 @@ local Tab = Window:MakeTab({Name = "Tab 1", Icon = "rbxassetid://4483345998", Pr
 local Section = Tab:AddSection({Name = "Section"})
 
 OrionLib:Init()
-		    
