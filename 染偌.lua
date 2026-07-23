@@ -1,7 +1,7 @@
 local mt = getrawmetatable(game)
 local old = mt.__newindex
 local Value = {
-	["Title of the library"] = "测试！！",
+	["Title of the library"] = "染偌",
 	["Tab 1"] = "标签1",
 	["Section"] = "部分"
 }
