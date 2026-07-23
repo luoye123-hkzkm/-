@@ -29,14 +29,6 @@ setreadonly(mt, true)
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
-local winShow = true
-UniversalTab:AddButton({
-	Name = "展开/收起面板",
-	Callback = function()
-		winShow = not winShow
-		Window.Instance.Visible = winShow
-	end
-})
 
 local MainTab = Window:MakeTab({Name = "公告", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local NoticeSec = MainTab:AddSection({Name = "公告内容"})
