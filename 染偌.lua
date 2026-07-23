@@ -29,21 +29,12 @@ setreadonly(mt, true)
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
-local TweenService = game:GetService("TweenService")
-local MainFrame = Window.Instance.MainFrame
-local ContentFrame = MainFrame.Content
-local SideState = true
-local TweenInfoSet = TweenInfo.new(0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
-
-Window:AddButton({
+local winShow = true
+UniversalTab:AddButton({
 	Name = "展开/收起面板",
 	Callback = function()
-		SideState = not SideState
-		if SideState then
-			TweenService:Create(ContentFrame,TweenInfoSet,{Size=UDim2.new(0.798,0,1,0)}):Play()
-		else
-			TweenService:Create(ContentFrame,TweenInfoSet,{Size=UDim2.new(0,0,1,0)}):Play()
-		end
+		winShow = not winShow
+		Window.Instance.Visible = winShow
 	end
 })
 
