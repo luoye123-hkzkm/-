@@ -56,13 +56,15 @@ UniversalTab:AddToggle({
 	end
 })
 
-UniversalTab:AddSlider({
+UniversalTab:AddTextbox({
 	Name = "速度设置",
-	Min = 1,
-	Max = 1000,
-	Default = 1,
+	Default = tostring(Speed),
+	TextDisappear = false,
 	Callback = function(v)
-		Speed = v
+		local num = tonumber(v)
+		if num then
+			Speed = num
+		end
 	end
 })
 
@@ -105,6 +107,18 @@ UniversalTab:AddToggle({
 	end
 })
 
+UniversalTab:AddToggle({
+	Name = "夜视",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+		    game.Lighting.Ambient = Color3.new(1, 1, 1)
+		else
+		    game.Lighting.Ambient = Color3.new(0, 0, 0)
+		end
+	end
+})
+
 UniversalTab:AddButton({
 	Name = "点击传送工具",
 	Callback = function()
@@ -116,3 +130,4 @@ local Tab = Window:MakeTab({Name = "Tab 1", Icon = "rbxassetid://4483345998", Pr
 local Section = Tab:AddSection({Name = "Section"})
 
 OrionLib:Init()
+		    
