@@ -17,6 +17,9 @@ setreadonly(mt, true)
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
+OrionLib:Notify("欢迎使用染偌", "作者染偌", "rbxassetid://17360377302", 3)
+OrionLib:Notify("启动完成", "祝你玩的开心","rbxassetid://17360377302",5)
+
 local MainTab = Window:MakeTab({Name = "公告", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local NoticeSec = MainTab:AddSection({Name = "公告内容"})
 local NoticeText = NoticeSec:AddLabel("染偌制作 请勿二改 倒卖 永久公益免费 感谢大家的支持～")
@@ -124,7 +127,7 @@ UniversalTab:AddToggle({
 UniversalTab:AddButton({
 	Name = "染飞行",
 	Callback = function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/FengYu-X/Function/refs/heads/main/fly.lua"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/luoye123-hkzkm/-/refs/heads/main/%E9%A3%9E%E8%A1%8C.lua"))()
 	end
 })
 
