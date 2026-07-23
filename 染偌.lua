@@ -14,11 +14,21 @@ mt.__newindex = newcclosure(function(tt, kk, v)
 end)
 setreadonly(mt, true)
 
+function Notify(Title1, Text1, Icon1, Time1)
+  game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = Title1,
+    Text = Text1,
+    Icon = Icon1,
+    Duration = Time1,
+  })
+end
+Notify("欢迎使用染偌", "作者染偌", "rbxassetid://17360377302", 3)
+Notify("永久免费", "没有盈利","rbxassetid://17360377302",3)
+Notify("拒绝跑路", "拒绝倒卖","rbxassetid://17360377302",3)
+Notify("启动完成", "祝你玩的开心","rbxassetid://17360377302",5)
+
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
-
-OrionLib:Notify("欢迎使用染偌", "作者染偌", "rbxassetid://17360377302", 3)
-OrionLib:Notify("启动完成", "祝你玩的开心","rbxassetid://17360377302",5)
 
 local MainTab = Window:MakeTab({Name = "公告", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local NoticeSec = MainTab:AddSection({Name = "公告内容"})
