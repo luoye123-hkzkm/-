@@ -1,6 +1,9 @@
 function Notify(Title1, Text1, Icon1, Time1)
   game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = Title1,Text = Text1,Icon = Icon1,Duration = Time1,
+    Title = Title1,
+    Text = Text1,
+    Icon = Icon1,
+    Duration = Time1,
   })
 end
 Notify("欢迎使用染偌", "作者染偌", "rbxassetid://17360377302", 3)
@@ -42,6 +45,7 @@ local UniversalTab = Window:MakeTab({Name = "通用", Icon = "rbxassetid://44833
 local Speed = 1
 local sudu = nil
 local Jump = nil
+local autoInteract = false
 
 UniversalTab:AddToggle({Name = "速度 (开/关)",Default = false,Callback = function(v)
 	if v then
@@ -102,87 +106,69 @@ end)
 tool.Parent = game.Players.LocalPlayer.Backpack
 end})
 
--- ====================== 轨道环绕独立分页 ======================
-local Players,RunService = game:GetService("Players"),game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-local OrbTab = Window:MakeTab({Name = "轨道环绕",Icon = "rbxassetid://84830962019412",PremiumOnly = false})
-local OrbSec = OrbTab:AddSection({Name = "玩家环绕轨道系统"})
+UniversalTab:AddToggle({Name="隐身〖实用〗",Default=false,Callback=function(state)
+    if state then
+        local savedpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        task.wait()
+        game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+        task.wait(.15)
+        local Seat = Instance.new('Seat', workspace)
+        Seat.Anchored = false
+        Seat.CanCollide = false
+        Seat.Name = 'invischair'
+        Seat.Transparency = 1
+        Seat.Position = Vector3.new(-25.95, 84, 3537.55)
+        local Weld = Instance.new("Weld", Seat)
+        Weld.Part0 = Seat
+        Weld.Part1 = game.Players.LocalPlayer.Character:FindFirstChild("Torso") or game.Players.LocalPlayer.Character.UpperTorso
+        task.wait()
+        Seat.CFrame = savedpos
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = 0.5
+            end
+        end
+    else
+        local invisChair = workspace:FindFirstChild('invischair')
+        if invisChair then
+            invisChair:Destroy()
+        end
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = 0
+            end
+        end
+    end
+end})
 
-local Controller = {Connections={},Destroyed=false}
-function Controller:AddConn(sig)table.insert(self.Connections,sig)return sig end
-function Controller:Destroy()
-	if self.Destroyed then return end self.Destroyed=true
-	for _,c in ipairs(self.Connections) do pcall(function()c:Disconnect()end end
-	table.clear(self.Connections)
-end
+UniversalTab:AddToggle({Name="自动互动",Default=false,Callback=function(state)
+    if state then
+        autoInteract = true
+        task.spawn(function()
+            while autoInteract do
+                for _,descendant in pairs(workspace:GetDescendants()) do
+                    if descendant:IsA("ProximityPrompt") then
+                        fireproximityprompt(descendant)
+                    end
+                end
+                task.wait(0.25)
+            end
+        end)
+    else
+        autoInteract = false
+    end
+end})
 
-local Character,Root,Humanoid
-local function SetupChar(char)
-	Character = char or LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-	Root,Humanoid = Character:WaitForChild("Humanoid"),Character:WaitForChild("Humanoid")
-end
-SetupChar()
-Controller:AddConn(LocalPlayer.CharacterAdded:Connect(SetupChar))
+UniversalTab:AddButton({Name="快速互动",Callback=function() 
+    game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+        prompt.HoldDuration = 0
+    end)
+end})
 
-local OrbitConfig = {Radius=8,Height=3,Smooth=12,Speed=2}
-local Circling,TargetPlayer,Angle,OrbitConn = false,nil,0,nil
+UniversalTab:AddToggle({Name="快速交互",Default=false,Callback=function(Fast)
+    Faster = Fast
+end})
 
-local function StopOrbit()
-	Circling,TargetPlayer,Angle = false,nil,0
-	if OrbitConn then pcall(function()OrbitConn:Disconnect()end) OrbitConn=nil end
-end
-
-local function StartOrbit(target)
-	if Circling then StopOrbit() end
-	if not target or target==LocalPlayer then return end
-	local tChar = target.Character
-	local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
-	if not tRoot then return end
-	Circling,TargetPlayer,Angle = true,target,math.random()*math.pi*2
-	OrbitConn = RunService.Heartbeat:Connect(function(dt)
-		if not Circling or not TargetPlayer then StopOrbit() return end
-		local tc = TargetPlayer.Character
-		local tr = tc and tc:FindFirstChild("HumanoidRootPart")
-		local th = tc and tc:FindFirstChildOfClass("Humanoid")
-		if not tr or (th and th.Health<=0) then StopOrbit() return end
-		Angle += OrbitConfig.Speed*dt
-		local pos = tr.Position
-		local desPos = Vector3.new(pos.X+OrbitConfig.Radius*math.cos(Angle),pos.Y+OrbitConfig.Height,pos.Z+math.sin(Angle))
-		local desCF = CFrame.lookAt(desPos,Vector3.new(pos.X,desPos.Y,pos.Z))
-		local alpha = 1-math.exp(-OrbitConfig.Smooth*dt)
-		Root.CFrame = Root.CFrame:Lerp(desCF,alpha)
-	end)
-	Controller:AddConn(OrbitConn)
-end
-
-Controller:AddConn(Players.PlayerRemoving:Connect(function(p)if TargetPlayer==p then StopOrbit()end end))
-
--- Orb分页UI控件
-OrbSec:AddLabel("使用说明：先选中目标玩家，再开启环绕")
-OrbSec:AddButton({
-	Name = "停止所有环绕",
-	Callback = function()StopOrbit()end
-})
-OrbSec:AddButton({
-	Name = "环绕速度+1",
-	Callback = function()OrbitConfig.Speed = math.clamp(OrbitConfig.Speed+1,1,10)end
-})
-OrbSec:AddButton({
-	Name = "环绕速度-1",
-	Callback = function()OrbitConfig.Speed = math.clamp(OrbitConfig.Speed-1,1,10)end
-})
-OrbSec:AddTextbox({
-	Name = "输入目标玩家用户名",
-	Default = "",
-	TextDisappear = false,
-	Callback = function(name)
-		local target = Players:FindFirstChild(name)
-		if target then StartOrbit(target) else Notify("轨道系统","未找到该玩家","rbxassetid://17360377302",2) end
-	end
-})
--- ====================== 轨道环绕结束 ======================
-
--- ESP 玩家透视模块
 local ESPTab = Window:MakeTab({Name = "玩家透视",Icon = "rbxassetid://84830962019412",PremiumOnly = false})
 local ESPSec = ESPTab:AddSection({Name = "ESP系统※",Collapsible = true})
 
@@ -194,7 +180,8 @@ local function GetBackpackWeapons(plr)
 end
 
 local ESPConfig = {Enabled=false,ShowName=true,ShowHealth=false,ShowDistance=false,ShowWeapon=false,ShowTeam=false,ShowBackpack=false,FillTransparency=0.5,OutlineTransparency=0.2,TextSize=14,TextOutline=true,TeammateColor=Color3.fromRGB(0,255,100),EnemyColor=Color3.fromRGB(255,50,50),MaxDistance=2000,UseDistanceFade=true,TeamCheck=true,HighlightEnabled=true,BoxOutlineEnabled=true,WallhackEnabled=false,NameTagSize=1,HealthBarEnabled=true,DistanceScale=true,UpdateRate=30}
-local Camera,RunServiceESP = workspace.CurrentCamera,game:GetService("RunService")
+local Players,Camera,RunService = game:GetService("Players"),workspace.CurrentCamera,game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 local ESPCache,LastUpdateTime = {},0
 
 local function CalcVis(dis,maxd) if dis>maxd then return 0 end local fs = maxd*0.8 if dis>fs then return 1-((dis-fs)/(maxd-fs)) end return 1 end
@@ -265,10 +252,9 @@ local function InitPlayer(plr)
 	plr.CharacterRemoving:Connect(function(c) if ESPCache[c] then ESPCache[c].Highlight:Destroy() ESPCache[c].Billboard:Destroy() ESPCache[c]=nil end end)
 end
 
-RunServiceESP.Heartbeat:Connect(function() if LocalPlayer.Character then pcall(UpdateESP) end end)
+RunService.Heartbeat:Connect(function() if LocalPlayer.Character then pcall(UpdateESP) end end)
 Players.PlayerAdded:Connect(InitPlayer)
 
--- ESP UI控件
 ESPSec:AddToggle({Name="开启ESP",Default=false,Callback=function(state)
 	ESPConfig.Enabled = state ResetESP()
 end})
