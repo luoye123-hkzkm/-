@@ -170,7 +170,22 @@ UniversalTab:AddToggle({Name="快速交互",Default=false,Callback=function(Fast
 end})
 
 local ESPTab = Window:MakeTab({Name = "玩家透视",Icon = "rbxassetid://84830962019412",PremiumOnly = false})
-local ESPSec = ESPTab:AddSection({Name = "ESP系统※",Collapsible = true})
+local ESPSec = ESPTab:AddSection({Name = "ESP系统※",Collapsible = false})
+
+task.spawn(function()
+    task.wait()
+    local Section = ESPSec.Instance
+    if Section and Section:IsA("GuiObject") then
+        Section.ClipsDescendants = true
+        Section.Size = UDim2.new(1, 0, 0, 420)
+        local Container = Section:FindFirstChildOfClass("ScrollingFrame")
+        if Container then
+            Container.CanvasSize = UDim2.new(0, 0, 0, 800)
+            Container.ScrollBarThickness = 6
+            Container.ClipsDescendants = true
+        end
+    end
+end)
 
 local function GetPlayerWeapon(char) local t = char:FindFirstChildOfClass("Tool") return t and t.Name or "没武器" end
 local function GetBackpackWeapons(plr)
