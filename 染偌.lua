@@ -80,7 +80,11 @@ UniversalTab:AddToggle({Name = "穿墙",Default = false,Callback = function(v)
 end})
 
 UniversalTab:AddToggle({Name = "夜视",Default = false,Callback = function(v) game.Lighting.Ambient = v and Color3.new(1,1,1) or Color3.new(0,0,0) end})
-UniversalTab:AddButton({Name = "染飞行",Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/luoye123-hkzkm/-/refs/heads/main/%E9%A3%9E%E8%A1%8C.lua"))() end})
+
+UniversalTab:AddButton({Name = "染飞行",Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/luoye123-hkzkm/-/refs/heads/main/%E9%A3%9E%E8%A1%8C.lua"))()
+    OrionLib:MakeNotification({Title="通知",Content="飞行加载成功",Duration=1,Icon="rbxassetid://4483345998"})
+end})
 
 UniversalTab:AddToggle({Name = "无限跳",Default = false,Callback = function(v)
 	if Jump then Jump:Disconnect() Jump = nil end
@@ -93,7 +97,11 @@ UniversalTab:AddToggle({Name = "停止移动",Default = false,Callback = functio
 	for _,obj in pairs(char:GetChildren()) do if obj:IsA("BasePart") then obj.Anchored = enabled end end
 end})
 
-UniversalTab:AddButton({Name = "踏空行走",Callback = function() loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float'))() end})
+UniversalTab:AddButton({Name = "踏空行走",Callback = function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float'))()
+    OrionLib:MakeNotification({Title="通知",Content="踏空行走加载成功",Duration=1,Icon="rbxassetid://4483345998"})
+end})
+
 UniversalTab:AddButton({Name = "点击传送工具",Callback = function()
 local mouse = game.Players.LocalPlayer:GetMouse()
 local tool = Instance.new("Tool")
@@ -104,6 +112,7 @@ tool.Activated:Connect(function()
 	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos.X,pos.Y,pos.Z)
 end)
 tool.Parent = game.Players.LocalPlayer.Backpack
+OrionLib:MakeNotification({Title="通知",Content="传送工具加载成功",Duration=1,Icon="rbxassetid://4483345998"})
 end})
 
 UniversalTab:AddToggle({Name="隐身〖实用〗",Default=false,Callback=function(state)
@@ -163,6 +172,7 @@ UniversalTab:AddButton({Name="快速互动",Callback=function()
     game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
         prompt.HoldDuration = 0
     end)
+    OrionLib:MakeNotification({Title="通知",Content="快速互动加载成功",Duration=1,Icon="rbxassetid://4483345998"})
 end})
 
 UniversalTab:AddToggle({Name="快速交互",Default=false,Callback=function(Fast)
@@ -171,6 +181,7 @@ end})
 
 UniversalTab:AddButton({Name="玩家加入提示",Callback=function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/boyscp/scriscriptsc/main/bbn.lua"))()
+    OrionLib:MakeNotification({Title="通知",Content="玩家加入提示加载成功",Duration=1,Icon="rbxassetid://4483345998"})
 end})
 
 local ESPTab = Window:MakeTab({Name = "玩家透视",Icon = "rbxassetid://84830962019412",PremiumOnly = false})
