@@ -13,259 +13,165 @@ Notify("启动完成", "祝你玩的开心","rbxassetid://17360377302",5)
 
 local mt = getrawmetatable(game)
 local old = mt.__newindex
-local Value = {
-    ["Title of the library"] = "染偌",
-    ["Tab 1"] = "标签1",
-    ["Section"] = "部分"
-}
-
+local Value = {["Title of the library"] = "染偌",["Tab 1"] = "标签1",["Section"] = "部分"}
 setreadonly(mt, false)
 mt.__newindex = newcclosure(function(tt, kk, v)
-    if kk == "Text" and (tt:IsA("TextLabel") or tt:IsA("TextButton") or tt:IsA("TextBox")) then
-        v = Value[v] or v
-    end
-    return old(tt, kk, v)
+	if kk == "Text" and (tt:IsA("TextLabel") or tt:IsA("TextButton") or tt:IsA("TextBox")) then v = Value[v] or v end
+	return old(tt, kk, v)
 end)
 setreadonly(mt, true)
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
-local Window = OrionLib:MakeWindow({
-    Name = "通用脚本",
-    HidePremium = false,
-    SaveConfig = false,
-    IntroText = "注入器："..identifyexecutor(),
-    ConfigFolder = "通用脚本"
-})
+local Window = OrionLib:MakeWindow({Name = "Title of the library", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
-OrionLib:MakeNotification({
-	Name = "脚本中心",
-	Content = "脚本内测作者染偌",
-	Image = "rbxassetid://4483345998",
-	Time = 6
-})
-
-local MainTab = Window:MakeTab({
-	Name = "公告",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-local InfoSec = MainTab:AddSection({Name = "信息面板"})
-InfoSec:Label("玩家名称："..game.Players.LocalPlayer.Name)
-InfoSec:Label("玩家ID:" .. tostring(game.Players.LocalPlayer.UserId))
-InfoSec:Label("服务器ID:"..tostring(game.GameId))
-InfoSec:Label("地区：" .. game:GetService("LocalizationService").RobloxLocaleId)
-InfoSec:Label("客户端ID:" .. game:GetService("RbxAnalyticsService"):GetClientId())
-
-local NoticeSec = MainTab:AddSection({Name = "公告"})
-local RainbowLabel = NoticeSec:Label("染偌制作 请勿二改 倒卖 永久公益免费 感谢大家的支持～")
+local MainTab = Window:MakeTab({Name = "公告", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local NoticeSec = MainTab:AddSection({Name = "公告内容"})
+local NoticeText = NoticeSec:AddLabel("染偌制作 请勿二改 倒卖 永久公益免费 感谢大家的支持～")
 task.spawn(function()
-    local labelObj = RainbowLabel.Instance:FindFirstChildOfClass("TextLabel")
-    local hue = 0
-    while task.wait(0.03) do
-        hue += 0.005
-        if hue > 1 then hue = 0 end
-        labelObj.TextColor3 = Color3.fromHSV(hue,1,1)
-    end
+	local txt = NoticeText.Instance:FindFirstChildWhichIsA("TextLabel", true)
+	local h = 0
+	while task.wait(0.05) do h = (h + 0.012) % 1 txt.TextColor3 = Color3.fromHSV(h, 1, 1) end
 end)
 
-local UniversalTab = Window:MakeTab({
-	Name = "通用",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-local Feng = UniversalTab:AddSection({Name = "〖修改权限※〗",Collapsible = true})
-local Speed = 16
-local JumpHeight = 50
-local sudu
-local Jump
+local InfoSec = MainTab:AddSection({Name = "玩家信息"})
+InfoSec:AddLabel("玩家名："..game.Players.LocalPlayer.Name)
+InfoSec:AddLabel("注入器："..identifyexecutor())
+InfoSec:AddLabel("玩家ID:" .. tostring(game.Players.LocalPlayer.UserId))
+InfoSec:AddLabel("服务器ID:"..tostring(game.GameId))
+InfoSec:AddLabel("地区：" .. game:GetService("LocalizationService").RobloxLocaleId)
+InfoSec:AddLabel("客户端ID:" .. game:GetService("RbxAnalyticsService"):GetClientId())
+
+local UniversalTab = Window:MakeTab({Name = "通用", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local Speed = 1
+local sudu = nil
+local Jump = nil
 local autoInteract = false
 
-Feng:AddTextbox({
-    Name = "移动速度",
-    Default = tostring(Speed),
-    Callback = function(input)
-        local num = tonumber(input)
-        if num then Speed = num end
-    end
-})
-Feng:AddTextbox({
-    Name = "跳跃高度",
-    Default = tostring(JumpHeight),
-    Callback = function(input)
-        local num = tonumber(input)
-        if num then JumpHeight = num end
-    end
-})
-Feng:AddButton({
-    Name = "恢复初始数值",
-    Callback = function()
-        Speed = 16
-        JumpHeight = 50
-    end
-})
-Feng:AddToggle({
-	Name = "速度 (开/关)",
-	Default = false,
-	Callback = function(v)
-		if v then
-			sudu = game:GetService("RunService").Heartbeat:Connect(function()
-				local lp = game.Players.LocalPlayer
-				if lp.Character and lp.Character:FindFirstChild("Humanoid") then
-					local hum = lp.Character.Humanoid
-					if hum.MoveDirection.Magnitude > 0 then
-						lp.Character:TranslateBy(hum.MoveDirection * Speed / 10)
-					end
-				end
-			end)
-		else
-			if sudu then sudu:Disconnect() sudu = nil end
-		end
-	end
-})
-Feng:AddToggle({
-	Name = "无限跳",
-	Default = false,
-	Callback = function(Value)
-        Jump = Value
-        game.UserInputService.JumpRequest:Connect(function()
-            if Jump and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
-                game.Players.LocalPlayer.Character.Humanoid:ChangeState("Jumping")
-            end
-        end)
-    end
-})
-Feng:AddToggle({
-	Name = "停止移动",
-	Default = false,
-	Callback = function(enabled)
-		local localPlayer = game.Players.LocalPlayer
-		local char = localPlayer.Character or localPlayer.CharacterAdded:Wait()
-		for _, child in pairs(char:GetChildren()) do
-			if child:IsA("BasePart") then
-				child.Anchored = enabled
+UniversalTab:AddToggle({Name = "速度 (开/关)",Default = false,Callback = function(v)
+	if v then
+		sudu = game:GetService("RunService").Heartbeat:Connect(function()
+			local lp = game.Players.LocalPlayer
+			if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+				local hum = lp.Character.Humanoid
+				if hum.MoveDirection.Magnitude > 0 then lp.Character:TranslateBy(hum.MoveDirection * Speed / 10) end
 			end
-		end
-		char.CharacterAdded:Connect(function(newChar)
-			task.wait(0.2)
-			for _, child in pairs(newChar:GetChildren()) do
-				if child:IsA("BasePart") then
-					child.Anchored = enabled
+		end)
+	elseif sudu then sudu:Disconnect() sudu = nil end
+end})
+
+UniversalTab:AddTextbox({Name = "速度设置",Default = tostring(Speed),TextDisappear = false,Callback = function(v) local num = tonumber(v) if num then Speed = num end end})
+UniversalTab:AddTextbox({Name = "跳跃高度",Default = "",TextDisappear = true,Callback = function(v) local c = game.Players.LocalPlayer.Character if c and c:FindFirstChild("Humanoid") then c.Humanoid.JumpPower = tonumber(v) or 50 end end})
+
+local Noclip,Stepped
+UniversalTab:AddToggle({Name = "穿墙",Default = false,Callback = function(v)
+	if v then
+		Noclip = true
+		Stepped = game:GetService("RunService").Stepped:Connect(function()
+			if Noclip then
+				local plr = game.Players.LocalPlayer.Name
+				if workspace:FindFirstChild(plr) then
+					for _,part in pairs(workspace[plr]:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = false end end
 				end
 			end
 		end)
+	else
+		Noclip = false if Stepped then Stepped:Disconnect() end
 	end
-})
-Feng:AddToggle({
-	Name = "夜视",
-	Default = false,
-	Callback = function(Value)
-		if Value then
-		    game.Lighting.Ambient = Color3.new(1, 1, 1)
-		else
-		    game.Lighting.Ambient = Color3.new(0, 0, 0)
-		end
-	end
-})
-Feng:AddButton({
-	Name = "染飞行",
-	Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/luoye123-hkzkm/-/refs/heads/main/%E9%A3%9E%E8%A1%8C.lua"))()
-    end
-})
-Feng:AddButton({
-	Name = "点击传送工具",
-	Callback = function()
-        local mouse = game.Players.LocalPlayer:GetMouse()
-        local tool = Instance.new("Tool")
-        tool.RequiresHandle = false
-        tool.Name = "[FE] TELEPORT TOOL"
-        tool.Activated:Connect(function()
-            local pos = mouse.Hit+Vector3.new(0,2.5,0)
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos.X,pos.Y,pos.Z)
-        end)
-        tool.Parent = game.Players.LocalPlayer.Backpack
-	end
-})
-Feng:AddButton({
-	Name = "踏空行走",
-	Callback = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float'))()
-	end
-})
-Feng:AddToggle({
-	Name="隐身〖实用〗",
-	Default=false,
-	Callback=function(state)
-        if state then
-            local savedpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-            task.wait()
-            game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
-            task.wait(.15)
-            local Seat = Instance.new('Seat', workspace)
-            Seat.Anchored = false
-            Seat.CanCollide = false
-            Seat.Name = 'invischair'
-            Seat.Transparency = 1
-            Seat.Position = Vector3.new(-25.95, 84, 3537.55)
-            local Weld = Instance.new("Weld", Seat)
-            Weld.Part0 = Seat
-            Weld.Part1 = game.Players.LocalPlayer.Character:FindFirstChild("Torso") or game.Players.LocalPlayer.Character.UpperTorso
-            task.wait()
-            Seat.CFrame = savedpos
-            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                if part:IsA("BasePart") or part:IsA("Decal") then
-                    part.Transparency = 0.5
-                end
+end})
+
+UniversalTab:AddToggle({Name = "夜视",Default = false,Callback = function(v) game.Lighting.Ambient = v and Color3.new(1,1,1) or Color3.new(0,0,0) end})
+UniversalTab:AddButton({Name = "染飞行",Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/luoye123-hkzkm/-/refs/heads/main/%E9%A3%9E%E8%A1%8C.lua"))() end})
+
+UniversalTab:AddToggle({Name = "无限跳",Default = false,Callback = function(v)
+	if Jump then Jump:Disconnect() Jump = nil end
+	if v then Jump = game.UserInputService.JumpRequest:Connect(function() local c = game.Players.LocalPlayer.Character if c and c:FindFirstChild("Humanoid") then c.Humanoid:ChangeState("Jumping") end end) end
+end})
+
+UniversalTab:AddToggle({Name = "停止移动",Default = false,Callback = function(enabled)
+	local lp = game.Players.LocalPlayer
+	local char = lp.Character or lp.CharacterAdded:Wait()
+	for _,obj in pairs(char:GetChildren()) do if obj:IsA("BasePart") then obj.Anchored = enabled end end
+end})
+
+UniversalTab:AddButton({Name = "踏空行走",Callback = function() loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float'))() end})
+UniversalTab:AddButton({Name = "点击传送工具",Callback = function()
+local mouse = game.Players.LocalPlayer:GetMouse()
+local tool = Instance.new("Tool")
+tool.RequiresHandle = false
+tool.Name = "点击传送工具"
+tool.Activated:Connect(function()
+	local pos = mouse.Hit+Vector3.new(0,2.5,0)
+	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos.X,pos.Y,pos.Z)
+end)
+tool.Parent = game.Players.LocalPlayer.Backpack
+end})
+
+UniversalTab:AddToggle({Name="隐身〖实用〗",Default=false,Callback=function(state)
+    if state then
+        local savedpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        task.wait()
+        game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+        task.wait(.15)
+        local Seat = Instance.new('Seat', workspace)
+        Seat.Anchored = false
+        Seat.CanCollide = false
+        Seat.Name = 'invischair'
+        Seat.Transparency = 1
+        Seat.Position = Vector3.new(-25.95, 84, 3537.55)
+        local Weld = Instance.new("Weld", Seat)
+        Weld.Part0 = Seat
+        Weld.Part1 = game.Players.LocalPlayer.Character:FindFirstChild("Torso") or game.Players.LocalPlayer.Character.UpperTorso
+        task.wait()
+        Seat.CFrame = savedpos
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = 0.5
             end
-        else
-            local invisChair = workspace:FindFirstChild('invischair')
-            if invisChair then
-                invisChair:Destroy()
-            end
-            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                if part:IsA("BasePart") or part:IsA("Decal") then
-                    part.Transparency = 0
-                end
+        end
+    else
+        local invisChair = workspace:FindFirstChild('invischair')
+        if invisChair then
+            invisChair:Destroy()
+        end
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = 0
             end
         end
     end
-})
-Feng:AddToggle({
-	Name="自动互动",
-	Default=false,
-	Callback=function(state)
-        if state then
-            autoInteract = true
-            task.spawn(function()
-                while autoInteract do
-                    for _,descendant in pairs(workspace:GetDescendants()) do
-                        if descendant:IsA("ProximityPrompt") then
-                            fireproximityprompt(descendant)
-                        end
+end})
+
+UniversalTab:AddToggle({Name="自动互动",Default=false,Callback=function(state)
+    if state then
+        autoInteract = true
+        task.spawn(function()
+            while autoInteract do
+                for _,descendant in pairs(workspace:GetDescendants()) do
+                    if descendant:IsA("ProximityPrompt") then
+                        fireproximityprompt(descendant)
                     end
-                    task.wait(0.25)
                 end
-            end)
-        else
-            autoInteract = false
-        end
-    end
-})
-Feng:AddButton({
-	Name="快速互动",
-	Callback=function()
-        game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-            prompt.HoldDuration = 0
+                task.wait(0.25)
+            end
         end)
+    else
+        autoInteract = false
     end
-})
-Feng:AddToggle({
-	Name="快速交互",
-	Default=false,
-	Callback=function(Fast)
-        Faster = Fast
-    end
-})
+end})
+
+UniversalTab:AddButton({Name="快速互动",Callback=function() 
+    game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+        prompt.HoldDuration = 0
+    end)
+end})
+
+UniversalTab:AddToggle({Name="快速交互",Default=false,Callback=function(Fast)
+    Faster = Fast
+end})
+
+UniversalTab:AddButton({Name="玩家加入提示",Callback=function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/boyscp/scriscriptsc/main/bbn.lua"))()
+end})
 
 local ESPTab = Window:MakeTab({Name = "玩家透视",Icon = "rbxassetid://84830962019412",PremiumOnly = false})
 local ESPSec = ESPTab:AddSection({Name = "ESP系统※",Collapsible = true})
@@ -356,18 +262,21 @@ Players.PlayerAdded:Connect(InitPlayer)
 ESPSec:AddToggle({Name="开启ESP",Default=false,Callback=function(state)
 	ESPConfig.Enabled = state ResetESP()
 end})
-ESPSec:AddToggle({Name="内部发光",Default=false,Callback=function(v) ESPConfig.HighlightEnabled=v;UpdateESP() end})
-ESPSec:AddToggle({Name="方框描边",Default=false,Callback=function(v) ESPConfig.BoxOutlineEnabled=v;UpdateESP() end})
-ESPSec:AddToggle({Name="显示玩家名字",Default=false,Callback=function(v) ESPConfig.ShowName=v;UpdateESP() end})
-ESPSec:AddToggle({Name="显示血量",Default=false,Callback=function(v) ESPConfig.ShowHealth=v;UpdateESP() end})
-ESPSec:AddToggle({Name="显示距离",Default=false,Callback=function(v) ESPConfig.ShowDistance=v;UpdateESP() end})
-ESPSec:AddToggle({Name="显示武器",Default=false,Callback=function(v) ESPConfig.ShowWeapon=v;UpdateESP() end})
-ESPSec:AddToggle({Name="显示背包",Default=false,Callback=function(v) ESPConfig.ShowBackpack=v;UpdateESP() end})
-ESPSec:AddColorPicker({Name="队友颜色",Default=Color3.fromRGB(0,255,100),Callback=function(c) ESPConfig.TeammateColor=c;UpdateESP() end})
-ESPSec:AddColorPicker({Name="敌人颜色",Default=Color3.fromRGB(255,50,50),Callback=function(c) ESPConfig.EnemyColor=c;UpdateESP() end})
-ESPSec:AddToggle({Name="显示队伍",Default=false,Callback=function(v) ESPConfig.ShowTeam=v;UpdateESP() end})
-ESPSec:AddToggle({Name="队伍检测",Default=false,Callback=function(v) ESPConfig.TeamCheck=v;UpdateESP() end})
-ESPSec:AddToggle({Name="穿墙显示",Default=false,Callback=function(v) ESPConfig.WallhackEnabled=v;UpdateESP() end})
-ESPSec:AddToggle({Name="距离缩放",Default=false,Callback=function(v) ESPConfig.DistanceScale=v;UpdateESP() end})
+ESPSec:AddToggle({Name="内部发光",Default=false,Callback=function(v) ESPConfig.HighlightEnabled=v end})
+ESPSec:AddToggle({Name="方框描边",Default=false,Callback=function(v) ESPConfig.BoxOutlineEnabled=v end})
+ESPSec:AddToggle({Name="显示玩家名字",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddColorPicker({Name="队友颜色",Default=Color3.fromRGB(0,255,100),Callback=function(c) ESPConfig.TeammateColor=c UpdateESP() end})
+ESPSec:AddToggle({Name="显示血量",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="显示距离",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="显示武器",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="显示背包",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddColorPicker({Name="敌人颜色",Default=Color3.fromRGB(255,50,50),Callback=function(c) ESPConfig.EnemyColor=c UpdateESP() end})
+ESPSec:AddToggle({Name="显示队伍",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="队伍检测",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="穿墙显示",Default=false,Callback=function() UpdateESP() end})
+ESPSec:AddToggle({Name="距离缩放",Default=false,Callback=function() UpdateESP() end})
+
+local Tab = Window:MakeTab({Name = "Tab 1", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local Section = Tab:AddSection({Name = "Section"})
 
 OrionLib:Init()
